@@ -7,9 +7,9 @@
     </v-container>
     <v-container>
       <v-card class="pb-5" v-for="toDo in toDoList" :key="toDo.id">
-        <v-card-title  v-text="'Title: ' + toDo.title"></v-card-title>
+        <v-card-title v-text="'Title: ' + toDo.title"></v-card-title>
         <v-card-subtitle v-text="'ID: ' + toDo.id"></v-card-subtitle>
-        <v-card-text  v-text="'Description: ' + toDo.description"></v-card-text>
+        <v-card-text v-text="'Description: ' + toDo.description"></v-card-text>
         <v-container>
           <div class="text-center ma-2">
             <v-btn
@@ -28,7 +28,8 @@
             <v-snackbar
                 v-model="snackbar1"
             >
-              <v-text-field type="text" v-model="title1" class="form-control ml-2" placeholder="Новое название">  </v-text-field>
+              <v-text-field type="text" v-model="title1" class="form-control ml-2"
+                            placeholder="Новое название"></v-text-field>
               <v-text-field type="text" v-model="description1" class="form-control ml-2" placeholder="Новое описание"/>
 
               <template v-slot:action="{ attrs }">
@@ -44,7 +45,7 @@
                   <v-btn color="yellow"
                          text
                          v-bind="attrs"
-                         v-on:click ="updateById(toDo.id);"
+                         v-on:click="updateById(toDo.id);"
                          @click="snackbar1 = false, visible = true">Обновить
                   </v-btn>
                 </v-container>
@@ -64,20 +65,20 @@
     <v-spacer>
     </v-spacer>
     <v-container>
-        <v-row justify="center">
-          <v-col
-              cols="12"
-              sm="6"
-              md="3"
-          >
-            <v-text-field
-                label="Поиск по ID"
-                placeholder="Введите ID"
-                outlined
-                v-model="inputId"
-            ></v-text-field>
-          </v-col>
-        </v-row>
+      <v-row justify="center">
+        <v-col
+            cols="12"
+            sm="6"
+            md="3"
+        >
+          <v-text-field
+              label="Поиск по ID"
+              placeholder="Введите ID"
+              outlined
+              v-model="inputId"
+          ></v-text-field>
+        </v-col>
+      </v-row>
     </v-container>
     <v-container>
       <v-row justify="center">
@@ -127,7 +128,8 @@
                   v-model="snackbar"
               >
                 <v-text-field type="text" v-model="title" class="form-control ml-2" placeholder="Введите название"/>
-                <v-text-field type="text" v-model="description" class="form-control ml-2" placeholder="Введите описание"/>
+                <v-text-field type="text" v-model="description" class="form-control ml-2"
+                              placeholder="Введите описание"/>
                 <div class="alert alert-success" v-if="isSuccess">Создание успешно</div>
 
                 <template v-slot:action="{ attrs }">
@@ -170,51 +172,72 @@ export default {
     description: "",
     title1: "",
     description1: "",
-    inputId:"",
+    inputId: "",
     visible: false,
     visible1: false,
     snackbar: false,
     snackbar1: false,
   }),
   methods: {
-    loadAll() {
-      axios.get("http://localhost:3000/todos").then((response) => {
-        this.toDoList = response.data.toDoList;
-      }).catch().finally();
+    async loadAll() {
+      try {
+        const responce = await axios.get("http://localhost:3000/todos");
+        this.toDoList = responce.data.toDoList;
+      } catch (e) {
+        console.log("loadAll" + e);
+      }
     },
-    getById(id) {
-      axios.get("http://localhost:3000/todos/" + id).then((responce) => {
+    async getById(id) {
+      try {
+        const responce = await axios.get("http://localhost:3000/todos/" + id);
         this.toDo1 = responce.data.toDo;
         this.loadAll();
-      });
+      } catch (e) {
+        console.log("getById" + e);
+      }
     },
-    create() {
-      axios.post("http://localhost:3000/todos",
-          {title: this.title, description: this.description}).then((response) => {
-        console.log(response);
-        this.loadAll();
-      });
-      this.title = '';
-      this.description = '';
-    },
-    deleteAll() {
-      axios.delete("http://localhost:3000/todos").then((responce) => {
+    async create() {
+      try {
+        const responce = await axios.post("http://localhost:3000/todos", {
+          title: this.title,
+          description: this.description
+        })
         console.log(responce);
         this.loadAll();
-      });
+        this.title = '';
+        this.description = '';
+      } catch (e) {
+        console.log("create" + e);
+      }
     },
-    updateById(id) {
-      axios.patch("http://localhost:3000/todos/" + id,
-          {title: this.title1, description: this.description1}).then((responce) => {
+    async deleteAll() {
+      try {
+        const responce = await axios.delete("http://localhost:3000/todos")
         console.log(responce);
         this.loadAll();
-      });
+      } catch (e) {
+        console.log("deleteAll" + e);
+      }
     },
-    deleteById(id) {
-      axios.delete("http://localhost:3000/todos/" + id).then((responce) => {
+    async updateById(id) {
+      try {
+        const responce = await axios.patch("http://localhost:3000/todos/" + id, {
+          title: this.title1,
+          description: this.description1
+        })
         console.log(responce);
         this.loadAll();
-      });
+      } catch (e) {
+        console.log("deleteAll" + e);
+      }
+    },
+    async deleteById(id) {
+      try {
+        await axios.delete("http://localhost:3000/todos/" + id);
+        this.loadAll();
+      } catch (e) {
+        console.log("deleteById" + e);
+      }
     },
   }
 };
